@@ -139,19 +139,19 @@ export class MulBuilder implements IEvalBuilder {
 export class ExpressionEval implements IEval {
 
     constructor(
-        private expression: string,
+        private filteredExpression: string,
         private memoryMap: Map<string, number>,
         private operators: Map<string, IEvalBuilder>[] =
-            [
-                new Map(
-                    [
-                        ['*', new MulBuilder()]
-                    ],
-                ),
+            [                
                 new Map(
                     [
                         ['+', new SumBuilder()],
                         ['-', new SubBuilder()],
+                    ],
+                ),
+                new Map(
+                    [
+                        ['*', new MulBuilder()]
                     ],
                 ),
             ]
@@ -163,12 +163,12 @@ export class ExpressionEval implements IEval {
 
             for (var [op, builder] of mop) {
 
-                let index = this.expression.indexOf(op);
+                let index = this.filteredExpression.lastIndexOf(op);
 
-                if( index > -1 ){
+                if( index > 0 ){
 
-                    let first = this.expression.slice(0, index);
-                    let last = this.expression.slice(index + 1);
+                    let first = this.filteredExpression.slice(0, index);
+                    let last = this.filteredExpression.slice(index + 1);
 
                     return builder.builder(
                         new ExpressionEval(first, this.memoryMap, this.operators),
@@ -179,15 +179,34 @@ export class ExpressionEval implements IEval {
 
         }
 
-        let aux = parseInt(this.expression);
+        let aux = parseInt(this.filteredExpression);
 
-        if( aux === NaN){
+        if(isNaN(aux)){
 
-            let aux2 = this.memoryMap.get(this.expression);
+            let index = this.filteredExpression.lastIndexOf('-');
+            let aux2:number | undefined = undefined;
+
+            if(index === 0){
+
+                let aux2 = this.memoryMap.get(''.concat(this.filteredExpression).slice(1));
+
+            }else{
+
+                let aux2 = this.memoryMap.get(this.filteredExpression);
+
+            }
 
             if(aux2){
 
-                return aux2;
+                if(index === 0){
+
+                    return -aux2;
+
+                } else {
+
+                    return aux2;
+
+                }
 
             }else{
 

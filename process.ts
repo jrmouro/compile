@@ -14,19 +14,19 @@ export class Process implements IProcess {
         private finalTermExpression: string = ';',
         private filterExpression: string = 'abcdfghijklmnopqsrtuvxzwy1234567890=-*+',
         private operators: Map<string, IEvalBuilder>[] =
-        [
-            new Map(
-                [
-                    ['*', new MulBuilder()]
-                ],
-            ),
-            new Map(
-                [
-                    ['+', new SumBuilder()],
-                    ['-', new SubBuilder()],
-                ],
-            ),
-        ]) { }
+            [
+                new Map(
+                    [
+                        ['+', new SumBuilder()],
+                        ['-', new SubBuilder()],
+                    ],
+                ),
+                new Map(
+                    [
+                        ['*', new MulBuilder()]
+                    ],
+                )
+            ]) { }
 
     exec(): void {
 
@@ -43,60 +43,61 @@ export class Process implements IProcess {
             const arr: string[] = data.toString().replace(/\r\n/g, '\n').split('\n');
 
 
-            let lineIndex = 0;
+            let lineIndex = 1;
 
             let expfilter = new ExpressionFilter(self.filterExpression);
 
-            for (let i of arr) {
-                
-                arr.forEach((line) => {
+            arr.forEach((line) => {
 
-                    line.split(self.finalTermExpression).forEach((exp) => {
+                let arr2 = line.split(self.finalTermExpression);
 
-                        if (exp.length > 1) { 
+                arr2.forEach((exp) => {
 
-                            let length = self.automaton.recognize(Array.from(exp + self.finalTermExpression), 0);
+                    if (exp.length > 0) {
 
-                            if (length === i.length) {
+                        let terms = Array.from(exp + self.finalTermExpression);
 
-                                expfilter.clear();
-            
-                                expfilter.concat(exp);
+                        let length = self.automaton.recognize(terms, 0);
 
-                                let filteredExpression = expfilter.get();
+                        if (length === terms.length) {
 
-                                self.processExpression(memoryMap, filteredExpression);
-            
-                            } else {
-            
-                                throw new Error('syntax error on line ' + lineIndex);
-            
-                            }
-            
+                            expfilter.clear();
+
+                            expfilter.concat(exp);
+
+                            let filteredExpression = expfilter.get();
+
+                            self.processExpression(memoryMap, filteredExpression);
+
+                        } else {
+
+                            throw new Error('syntax error on line ' + lineIndex);
+
                         }
 
-                    });
+                    }
+
                 });
 
                 lineIndex++;
 
-            }
+            });
 
         });
     }
 
-    processExpression(memoryMap: Map<string, number>, expression:string):void{
+    processExpression(memoryMap: Map<string, number>, expression: string): void {
 
         let index = expression.indexOf('=');
 
-        if(expression.indexOf('=') > -1){
+        if (expression.indexOf('=') > -1) {
 
             let first = expression.slice(0, index);
             let last = expression.slice(index + 1);
 
             memoryMap.set(first, new ExpressionEval(last, memoryMap, this.operators).value());
 
-        }else{
+        } else {
 
             console.log(new ExpressionEval(expression, memoryMap, this.operators).value())
 
