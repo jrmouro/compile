@@ -1,77 +1,37 @@
-export interface IExpression{
-    builder(term:string, initial:boolean, final:boolean):void;
-    process():void;
+export interface IExpressionFilter {
+    concat(term: string): void;
+    clear(): void;
+    get(): string;
 }
 
-export abstract class Expression implements IExpression{
+export class ExpressionFilter implements IExpressionFilter {
 
-    protected acc:string = '';
+    protected expression: string = '';
 
-    constructor(protected memoryMap:Map<string,number>){}
+    constructor(
+        protected filter: string = 'abcdfghijklmnopqsrtuvxzwy1234567890=-*+') { }
 
-    builder(term: string, initial:boolean, final:boolean = false): void {
-
-        if(initial){
-            this.acc = '';
-        }
-
-        this.acc += term;
-        
-        if(final){
-            this.process();
-        }
+    get(): string {
+        return this.expression;
     }
 
-    abstract process(): void ;
-
-}
-
-export class AssignExpression extends Expression{
-
-    acc:string = '';
-
-    constructor(memoryMap:Map<string,number>){
-        super(memoryMap);
+    clear(): void {
+        this.expression = '';
     }
 
-    process(): void {
+    concat(term: string): void {
 
-        
+        for (var index = 0; index < term.length; index++) {
 
-    }
+            let c = term.charAt(index);
 
-}
+            if (this.filter.indexOf(c) > -1) {
 
-export class PrintExpression  extends Expression{
-
-    acc:string = '';
-
-    constructor(memoryMap:Map<string,number>){
-        super(memoryMap);
-    }
-
-    process(): void {
-
-        if(parseInt(this.acc) === NaN){
-
-            let value = this.memoryMap.get(this.acc);
-
-            if(value){
-
-                console.log(value);
-
-            }else{
-
-                throw new Error('undeclared variable');
+                this.expression += c;
 
             }
 
-        }else{
-
-            console.log(this.acc);
-
         }
-
     }
 
 }

@@ -1,4 +1,4 @@
-import { ITransition, Transition } from "./trasition";
+import { ITransition, Transition } from "./transition";
 
 export interface IState<S, T> {
     recognize(terms: T[], value: number): number;
