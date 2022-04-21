@@ -1,6 +1,6 @@
 import { IAutomaton } from "./automaton";
-import { ExpressionEval, IEvalBuilder, MulBuilder, SubBuilder, SumBuilder } from "./eval";
-import { ExpressionFilter, IExpressionFilter } from "./expression";
+import { ExpressionEval, IEvalBuilder, MulBuilder, SubBuilder, SumBuilder } from "./expression_eval";
+import { ExpressionFilter, IExpressionFilter } from "./expression_filter";
 
 export interface IProcess {
     exec(): void;

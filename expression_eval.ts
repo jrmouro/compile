@@ -43,9 +43,25 @@ export class Variable implements IEval {
 
 export abstract class OperationEval implements IEval {
 
-    constructor(protected eval1: IEval, protected eval2: IEval) { }
+    constructor(protected eval1: IEval, protected eval2?: IEval) { }
 
     abstract value(_value?: number): number;
+
+}
+
+export class Neg extends OperationEval {
+
+    constructor(eval1: IEval) {
+
+        super(eval1);
+
+    }
+
+    value(_value?: number): number {
+
+        return -this.eval1.value();
+
+    }
 
 }
 
@@ -60,7 +76,7 @@ export class Sum extends OperationEval {
 
     value(_value?: number): number {
 
-        return this.eval1.value() + this.eval2.value();
+        return this.eval1.value() + this.eval2!.value();
 
     }
 
@@ -76,7 +92,7 @@ export class Sub extends OperationEval {
 
     value(_value?: number): number {
 
-        return this.eval1.value() - this.eval2.value();
+        return this.eval1.value() - this.eval2!.value();
 
     }
 
@@ -92,7 +108,7 @@ export class Mul extends OperationEval {
 
     value(_value?: number): number {
 
-        return this.eval1.value() * this.eval2.value();
+        return this.eval1.value() * this.eval2!.value();
 
     }
 
@@ -100,15 +116,31 @@ export class Mul extends OperationEval {
 
 export interface IEvalBuilder {
 
-    builder(eval1: IEval, eval2: IEval): IEval;
+    builder(eval1: IEval, eval2?: IEval): IEval;
 
 }
 
+export class NegBuilder implements IEvalBuilder {
+
+    builder(eval1: IEval, eval2?: IEval): IEval {
+
+        return new Neg(eval1);       
+
+    }
+
+};
+
 export class SumBuilder implements IEvalBuilder {
 
-    builder(eval1: IEval, eval2: IEval): IEval {
+    builder(eval1: IEval, eval2?: IEval): IEval {
 
-        return new Sum(eval1, eval2);
+        if(eval2){
+
+            return new Sum(eval1, eval2);
+
+        }
+
+        return eval1;        
 
     }
 
@@ -116,9 +148,15 @@ export class SumBuilder implements IEvalBuilder {
 
 export class SubBuilder implements IEvalBuilder {
 
-    builder(eval1: IEval, eval2: IEval): IEval {
+    builder(eval1: IEval, eval2?: IEval): IEval {
 
-        return new Sub(eval1, eval2);
+        if(eval2){
+
+            return new Sub(eval1, eval2);
+
+        }
+
+        return eval1;        
 
     }
 
@@ -126,9 +164,15 @@ export class SubBuilder implements IEvalBuilder {
 
 export class MulBuilder implements IEvalBuilder {
 
-    builder(eval1: IEval, eval2: IEval): IEval {
+    builder(eval1: IEval, eval2?: IEval): IEval {
 
-        return new Mul(eval1, eval2);
+        if(eval2){
+
+            return new Mul(eval1, eval2);
+
+        }
+
+        return eval1;        
 
     }
 
