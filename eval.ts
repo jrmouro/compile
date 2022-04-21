@@ -188,11 +188,11 @@ export class ExpressionEval implements IEval {
 
             if(index === 0){
 
-                let aux2 = this.memoryMap.get(''.concat(this.filteredExpression).slice(1));
+                aux2 = this.memoryMap.get(''.concat(this.filteredExpression).slice(1));
 
             }else{
 
-                let aux2 = this.memoryMap.get(this.filteredExpression);
+                aux2 = this.memoryMap.get(this.filteredExpression);
 
             }
 
